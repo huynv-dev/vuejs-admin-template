@@ -167,8 +167,8 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted } from 'vue';
-import { useCategoriesStore } from '@/store/categories';
-import { useArticlesStore } from '@/store/articles';
+import { useCategoriesStore } from '@/stores/categories';
+import { useArticlesStore } from '@/stores/articles';
 import type { Category } from '@/types/models';
 
 export default defineComponent({

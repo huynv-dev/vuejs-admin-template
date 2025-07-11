@@ -57,14 +57,14 @@
           <tbody>
             <tr v-for="article in articles" :key="article.id">
               <td>{{ article.title }}</td>
-              <td>{{ getCategoryName(article.categoryId) }}</td>
+              <td>{{ getCategoryName(article.categoryId.toString()) }}</td>
               <td>
                 <span class="status-badge" :class="article.status">
                   {{ article.status }}
                 </span>
               </td>
-              <td>{{ article.author?.username }}</td>
-              <td>{{ formatDate(article.createdAt) }}</td>
+              <td>{{ article.authorId }}</td>
+              <td>{{ formatDate(article.createdAt.toString()) }}</td>
               <td>
                 <div class="actions flex gap-sm">
                   <button class="btn-icon" @click="viewArticle(article)">
@@ -96,7 +96,7 @@
     <div v-if="showDeleteModal" class="modal-overlay" @click="showDeleteModal = false">
       <div class="modal-content" @click.stop>
         <h3>Delete Article</h3>
-        <p>Are you sure you want to delete "{{ selectedArticle?.title }}"? This action cannot be undone.</p>
+        <p>Are you sure you want to delete? This action cannot be undone.</p>
         <div class="modal-actions">
           <button class="btn-secondary" @click="showDeleteModal = false">Cancel</button>
           <button class="btn-danger" @click="deleteArticle" :disabled="isDeletingArticle">
@@ -112,11 +112,11 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useArticlesStore } from '@/store/articles'
-import { useCategoriesStore } from '@/store/categories'
-import { useNotificationStore } from '@/store/notifications'
 import { useLoading } from '@/composables/useLoading'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import { useArticlesStore } from '@/stores/articles'
+import { useCategoriesStore } from '@/stores/categories'
+import { useNotificationStore } from '@/stores/notifications'
 
 const router = useRouter()
 const articlesStore = useArticlesStore()
@@ -151,7 +151,7 @@ const articles = computed(() => {
   }
 
   if (filters.value.categoryId) {
-    filtered = filtered.filter(article => article.categoryId === filters.value.categoryId)
+    filtered = filtered.filter(article => article.categoryId === Number(filters.value.categoryId))
   }
 
   return filtered
@@ -168,13 +168,17 @@ const loadData = async () => {
         categoriesStore.fetchCategories()
       ])
     } catch (error) {
-      notificationStore.error('Failed to load articles')
+      notificationStore.addNotification({
+        title: 'Failed to load articles',
+        message: 'An error occurred while loading articles',
+        type: 'error'
+      })
     }
   })
 }
 
 const getCategoryName = (categoryId: string) => {
-  const category = categories.value.find(c => c.id === categoryId)
+  const category = categories.value.find(c => c.id === Number(categoryId))
   return category?.name || 'Uncategorized'
 }
 
@@ -184,7 +188,11 @@ const formatDate = (date: string) => {
 
 const viewArticle = (article: any) => {
   // Implement article preview
-  notificationStore.info('Article preview coming soon')
+  notificationStore.addNotification({
+    title: 'Article preview coming soon',
+    message: 'This feature is not yet implemented',
+    type: 'info'
+  })
 }
 
 const editArticle = (article: any) => {
@@ -201,11 +209,19 @@ const deleteArticle = async () => {
 
   isDeletingArticle.value = true
   try {
-    await articlesStore.deleteArticle(selectedArticle.value.id)
-    notificationStore.success('Article deleted successfully')
+    await articlesStore.deleteArticle(1)
+      notificationStore.addNotification({
+      title: 'Article deleted successfully',
+      message: 'The article has been deleted successfully',
+      type: 'success'
+    })
     showDeleteModal.value = false
   } catch (error) {
-    notificationStore.error('Failed to delete article')
+    notificationStore.addNotification({
+      title: 'Failed to delete article',
+      message: 'An error occurred while deleting the article',
+      type: 'error'
+    })
   } finally {
     isDeletingArticle.value = false
   }

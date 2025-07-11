@@ -196,9 +196,9 @@
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useArticlesStore } from '@/store/articles';
-import { useCategoriesStore } from '@/store/categories';
 import type { Article } from '@/types/models';
+import { useArticlesStore } from '@/stores/articles';
+import { useCategoriesStore } from '@/stores/categories';
 
 export default defineComponent({
   name: 'ArticleFormView',
